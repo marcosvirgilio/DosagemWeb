@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Dosagem</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Proteção de rota - verificar autenticação antes de carregar a página
+        if (!localStorage.getItem('usuario')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>🍺 Sistema de Dosagem</h1>
+                    <p>Controle de barris e demandas</p>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" id="userName">Usuário</span>
+                    <button class="btn btn-small" onclick="app.logout()">Sair</button>
+                </div>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="barris">Barris</button>
+            <button class="tab-btn" data-tab="demandas">Demandas</button>
+            <button class="tab-btn" data-tab="usuarios" id="tabUsuarios">Usuários</button>
+        </nav>
+
+        <!-- Seção de Barris -->
+        <section id="barris" class="tab-content active">
+            <div class="card">
+                <h2>📦 Cadastrar Novo Barril</h2>
+                <form id="formBarril">
+                    <div class="form-group">
+                        <label for="deProduto">Produto:</label>
+                        <input type="text" id="deProduto" name="deProduto" placeholder="Ex: Chopp Pilsen" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vlLitrosTotal">Volume Total (litros):</label>
+                        <input type="number" id="vlLitrosTotal" name="vlLitrosTotal" step="0.01" placeholder="50.00" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar Barril</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 Barris Disponíveis</h2>
+                    <button class="btn btn-small" onclick="app.listarBarris()">🔄 Atualizar</button>
+                </div>
+                <div id="listaBarris" class="lista">
+                    <p class="loading">Carregando barris...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Demandas -->
+        <section id="demandas" class="tab-content">
+            <div class="card">
+                <h2>➕ Criar Nova Demanda</h2>
+                <form id="formDemanda">
+                    <div class="form-group">
+                        <label for="idBarril">Barril:</label>
+                        <select id="idBarril" name="idBarril" required>
+                            <option value="">Selecione um barril</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vlLitrosDemanda">Volume (litros):</label>
+                        <input type="number" id="vlLitrosDemanda" name="vlLitrosDemanda" step="0.01" min="0.01" placeholder="5.00" required>
+                        <small id="volumeDisponivel" class="form-helper"></small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Criar Demanda</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>⏳ Demandas Pendentes</h2>
+                    <button class="btn btn-small" onclick="app.listarDemandas()">🔄 Atualizar</button>
+                </div>
+                <div id="listaDemandas" class="lista">
+                    <p class="loading">Carregando demandas...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Usuários -->
+        <section id="usuarios" class="tab-content">
+            <div class="card" id="formCadastroUsuarioCard" style="display:none;">
+                <div class="card-header">
+                    <h2>➕ Cadastrar Novo Usuário</h2>
+                    <small style="color: var(--text-muted);">⚠️ Apenas administradores</small>
+                </div>
+                <form id="formCadastrarUsuario">
+                    <div class="form-group">
+                        <label for="cadNmUsuario">Nome:</label>
+                        <input type="text" id="cadNmUsuario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cadDeEmail">Email:</label>
+                        <input type="email" id="cadDeEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cadDeSenha">Senha:</label>
+                        <input type="password" id="cadDeSenha" required minlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="cadAdmin">
+                            Administrador
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar Usuário</button>
+                    <button type="button" class="btn" onclick="app.cancelarCadastroUsuario()">Cancelar</button>
+                </form>
+            </div>
+
+            <div class="card" id="formUsuarioCard" style="display:none;">
+                <div class="card-header">
+                    <h2>📝 Editar Usuário</h2>
+                    <small style="color: var(--text-muted);">⚠️ Apenas administradores</small>
+                </div>
+                <form id="formEditarUsuario">
+                    <input type="hidden" id="editIdUsuario">
+                    <div class="form-group">
+                        <label for="editNmUsuario">Nome:</label>
+                        <input type="text" id="editNmUsuario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDeEmail">Email:</label>
+                        <input type="email" id="editDeEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="editAdmin">
+                            Administrador
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Atualizar Usuário</button>
+                    <button type="button" class="btn" onclick="app.cancelarEdicaoUsuario()">Cancelar</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>👥 Usuários do Sistema</h2>
+                    <div>
+                        <button class="btn btn-small btn-primary" onclick="app.abrirCadastroUsuario()" id="btnNovoUsuario" style="margin-right: 8px; display:none;">➕ Novo Usuário</button>
+                        <button class="btn btn-small" onclick="app.listarUsuarios()">🔄 Atualizar</button>
+                    </div>
+                </div>
+                <div id="listaUsuarios" class="lista">
+                    <p class="loading">Carregando usuários...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast de notificações -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Modal de Edição de Barril -->
+    <div id="modalEditarBarril" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Barril</h2>
+                <button class="modal-close" onclick="app.fecharModalEditar()">&times;</button>
+            </div>
+            <form id="formEditarBarril">
+                <input type="hidden" id="editIdBarril">
+                <div class="form-group">
+                    <label for="editDeProduto">Produto:</label>
+                    <input type="text" id="editDeProduto" name="editDeProduto" required>
+                </div>
+                <div class="form-group">
+                    <label for="editVlLitrosTotal">Volume Total (litros):</label>
+                    <input type="number" id="editVlLitrosTotal" name="editVlLitrosTotal" step="0.01" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-small" onclick="app.fecharModalEditar()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="modalConfirmarExclusao" class="modal">
+        <div class="modal-content modal-confirm">
+            <div class="modal-confirm-icon" id="modalConfirmarIcone">
+                <svg id="iconeDelete" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/>
+                    <path d="M10 11v6M14 11v6"/>
+                </svg>
+                <svg id="iconeSuccess" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
+            <h2 id="modalConfirmarTitulo">Confirmar Exclusão</h2>
+            <p id="modalConfirmarTexto">Tem certeza que deseja deletar este barril?</p>
+            <p class="modal-confirm-warning" id="modalConfirmarAviso">⚠️ Esta ação não pode ser desfeita!</p>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-small" onclick="app.fecharModalConfirmar()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Sim, Deletar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

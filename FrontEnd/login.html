@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Dosagem</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Se já estiver autenticado, redirecionar para a página principal
+        if (localStorage.getItem('usuario')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🍺 Sistema de Dosagem</h1>
+                <p>Gerencie seus barris e demandas</p>
+            </div>
+
+            <!-- Tabs de Login/Registro -->
+            <div class="login-tabs">
+                <button class="login-tab-btn active" data-tab="login">Entrar</button>
+                <button class="login-tab-btn" data-tab="register">Cadastrar</button>
+            </div>
+
+            <!-- Form de Login -->
+            <div id="login" class="login-tab-content active">
+                <form id="formLogin">
+                    <div class="form-group">
+                        <label for="loginEmail">Email:</label>
+                        <input type="email" id="loginEmail" name="loginEmail" placeholder="seu@email.com" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginSenha">Senha:</label>
+                        <input type="password" id="loginSenha" name="loginSenha" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btnLogin">Entrar</button>
+                </form>
+            </div>
+
+            <!-- Form de Registro -->
+            <div id="register" class="login-tab-content">
+                <form id="formRegister">
+                    <div class="form-group">
+                        <label for="registerNome">Nome:</label>
+                        <input type="text" id="registerNome" name="registerNome" placeholder="Seu nome completo" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email:</label>
+                        <input type="email" id="registerEmail" name="registerEmail" placeholder="seu@email.com" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerSenha">Senha:</label>
+                        <input type="password" id="registerSenha" name="registerSenha" placeholder="Mínimo 6 caracteres" minlength="6" required autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerConfirmaSenha">Confirmar Senha:</label>
+                        <input type="password" id="registerConfirmaSenha" name="registerConfirmaSenha" placeholder="Digite a senha novamente" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btnRegister">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <!-- Toast de notificações -->
+    <div id="toast" class="toast"></div>
+
+    <script src="auth.js"></script>
+</body>
+</html>
